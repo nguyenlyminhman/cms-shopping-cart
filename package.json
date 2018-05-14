@@ -1,0 +1,31 @@
+{
+  "name": "cms-shopping-cart",
+  "version": "1.0.0",
+  "description": "\"building the full function for the e-com website (including cms)\"",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nguyenlyminhman/cms-shopping-cart.git"
+  },
+  "keywords": [
+    "cms-shopping-cart"
+  ],
+  "author": "nguyenlyminhman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nguyenlyminhman/cms-shopping-cart/issues"
+  },
+  "homepage": "https://github.com/nguyenlyminhman/cms-shopping-cart#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "config": "^1.30.0",
+    "ejs": "^2.6.1",
+    "express": "^4.16.3",
+    "gulp": "^3.9.1",
+    "gulp-nodemon": "^2.2.1",
+    "mongoose": "^5.1.0"
+  }
+}
