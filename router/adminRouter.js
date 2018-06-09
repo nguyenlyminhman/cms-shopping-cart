@@ -1,6 +1,7 @@
 const express = require('express');
 const adminRouter = express.Router();
 let Page = require('../models/page');
+let { removeSpace } = require('../common/slugHelper');
 
 //[2018.06.01] get dashboard admin
 adminRouter.get('/', (req, res) => {
@@ -8,17 +9,20 @@ adminRouter.get('/', (req, res) => {
 });
 //[2018.06.01] get page management 
 adminRouter.get('/page', (req, res) => {
-    res.render('page/admin/page', {
-        ptitle: 'Page management...',
-        breadscrum: 'Page Management'
-    });
+    Page.find({}).sort({ 'title': 1 }).exec((err, data) => {
+        res.render('page/admin/page', {
+            ptitle: 'Page management...',
+            breadscrum: 'Page Management',
+            page: data
+        });
+    })
+
 });
 //[2018.06.01] get the add new page form
 adminRouter.get('/page/add-page', (req, res) => {
     res.render('page/admin/add-page', {
         ptitle: 'Add new page...',
         breadscrum: 'Add new',
-
         title: '',
         slug: '',
         content: ''
@@ -41,7 +45,7 @@ adminRouter.post('/page/add-page', (req, res) => {
             content: content
         });
     } else {
-        Page.findOne({ slug: slug }, (err, page) => {
+        Page.findOne({ slug: removeSpace(slug) }, (err, page) => {
             if (page) {
                 req.flash('danger', 'Slug was exist.');
                 res.render('page/admin/add-page', {
@@ -55,7 +59,7 @@ adminRouter.post('/page/add-page', (req, res) => {
             } else {
                 let page = new Page({
                     title: title,
-                    slug: slug,
+                    slug: removeSpace(slug),
                     content: content,
                     sorting: 0
                 });

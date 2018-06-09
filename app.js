@@ -23,7 +23,7 @@ mongoose.connect(db());
 //using bodyParser middleware to parse incoming request bodies before your handlers.
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
+app.use(express.static('public'));
 //using connect-flash to send error message
 app.use(require('connect-flash')());
 app.use(function (req, res, next) {
