@@ -1,0 +1,12 @@
+<%= messages('messages', locals) %>
+    <%if(errors){%>
+        <div class="col-lg-6 alert alert-danger">
+            <%errors.forEach(err=>{%>
+                <ul>
+                    <li>
+                        <%= err.msg %>
+                    </li>
+                </ul>
+                <%})%>
+        </div>
+        <%}%>

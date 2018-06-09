@@ -16,25 +16,38 @@ app.use(session({
   saveUninitialized: true,
   cookie: { secure: true }
 }))
+
 //Connect to database (using mongo db).
 mongoose.connect(db());
+
 //using bodyParser middleware to parse incoming request bodies before your handlers.
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-//
+
+//using connect-flash to send error message
 app.use(require('connect-flash')());
 app.use(function (req, res, next) {
-    res.locals.messages = require('express-messages')(req, res);
-    next();
-  });
+  res.locals.messages = require('express-messages')(req, res);
+  next();
+});
+
+//set local global errors
+app.locals.errors = null;
+
+//using express-validator to check value get from form.
+app.use(validate());
+
 //set views engine for website.
 app.set('views', 'views');
 app.set('view engine', 'ejs');
+
 //set router for website
 app.use('/', router);
+
 //get the server port
 var port = config.get("server.port");
+
 //start the server
 app.listen(port || process.env.port, () => {
-    console.log('The cms-shopping-cart web-page is listening on port', port);
+  console.log('The cms-shopping-cart web-page is listening on port', port);
 });

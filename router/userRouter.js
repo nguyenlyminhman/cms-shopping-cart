@@ -3,7 +3,14 @@ const userRouter = express.Router();
 
 
 userRouter.get('/', (req,res)=>{
-    res.render('index', {title: 'e-commerce home page'})
+    let slug='';
+    let title='';
+    let content='';
+    res.render('index', {
+        title: title,
+        slug: slug,
+        content: content,
+    })
 });
 
 

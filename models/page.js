@@ -14,8 +14,8 @@ var PageSchema = mongoose.Schema ({
         require: true
     },
     sorting : {
-        type: number,
+        type: Number
     }
-})
+},{collection:'PageSchema'})
  module.exports = mongoose.model('PageSchema', PageSchema)
  
