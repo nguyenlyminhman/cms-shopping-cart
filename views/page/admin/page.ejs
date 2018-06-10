@@ -9,37 +9,55 @@
 
         <a href="/admin/page/add-page" class="btn btn-info float-right"> Add new </a>
     </div>
-    <br/><br/>
+    <br/>
+    <br/>
     <div class="rows">
         <table class="table table-hover table-dark" id="table_page">
             <thead>
                 <tr>
-                    <th scope="col">#</th>
+
                     <th scope="col">Title</th>
                     <th scope="col">Option</th>
                 </tr>
             </thead>
             <tbody>
-                <% let i = 1 %>
-                    <% page.forEach(data=>{%>
-                        <tr>
-                            <th scope="row">
-                                <%=i++%>
-                            </th>
-                            <td>
-                                <%=data.title%>
-                            </td>
-                            <td>
-                                <a href="/admin/page/edit/<%=data.slug%>">
-                                <img src="/img/pencil.png" /> </a> || 
-                                <a href="/admin/page/delete/<%=data._id%>">
-                                <img src="/img/delete.png" /> 
+
+                <% page.forEach(data=>{%>
+                    <tr id="id_<%=data._id%>" class="<%=data.slug%>">
+
+                        <td>
+                            <%=data.title%>
+                        </td>
+                        <td>
+                            <a href="/admin/page/edit/<%=data.slug%>">
+                                <img src="/img/pencil.png" /> </a> ||
+                            <a href="/admin/page/delete/<%=data._id%>">
+                                <img src="/img/delete.png" />
                             </a>
-                            </td>
-                        </tr>
-                        <%})%>
+                        </td>
+                    </tr>
+                    <%})%>
             </tbody>
         </table>
     </div>
-
     <% include ../../layout/admin/footer %>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $('tbody').sortable({
+            items: "tr:not('.home')",
+            placeholder: "ui-state-hightlight",
+            update: function (event, ui) {
+                var ids = $('tbody').sortable("serialize");
+                var url = "/admin/page/reorder";
+            $.ajax({
+                data:ids,
+                type:'Post',
+                url: url
+            })
+            //$.Post(url, ids)
+        }
+        }
+    )
+    </script>
+    

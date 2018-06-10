@@ -9,7 +9,7 @@ adminRouter.get('/', (req, res) => {
 });
 //[2018.06.01] get page management 
 adminRouter.get('/page', (req, res) => {
-    Page.find({}).sort({ 'title': 1 }).exec((err, data) => {
+    Page.find({}).sort({ 'sorting': 1 }).exec((err, data) => {
         res.render('page/admin/page', {
             ptitle: 'Page management...',
             breadscrum: 'Page Management',
@@ -80,7 +80,25 @@ adminRouter.post('/page/add-page', (req, res) => {
             }
         })
     }
-
+});
+//[2018.06.10] post to reorder page
+adminRouter.post('/page/reorder', (req, res) => {
+    let ids = req.body;
+    let count = 0;
+    for (var i = 0; i < ids.id.length; i++) {
+        var id = ids.id[i];
+        count++;
+        (function (count) {
+            Page.findById(id, (err, page) => {
+                page.sorting = count;
+                page.save(err => {
+                    if (err) {
+                        return console.log(err + '');
+                    }
+                })
+            })
+        })(count);
+    }
 });
 //[2018.06.01] get the editting page form
 adminRouter.get('/page/edit', (req, res) => {
