@@ -161,7 +161,7 @@ adminRouter.post('/page/edit/:id', (req, res) => {
                         //Find the page base on its id.
                         Page.findById({ _id: id }, (err, page) => {
                             if (err)
-                                console.log(err+'');
+                                console.log(err + '');
                             //assign new value    
                             page.title = title;
                             page.slug = slug;
@@ -190,7 +190,7 @@ adminRouter.post('/page/edit/:id', (req, res) => {
                 //the slug is not change
                 Page.findById({ _id: id }, (err, page) => {
                     if (err)
-                        console.log(err+'');
+                        console.log(err + '');
                     page.title = title;
                     page.slug = slug;
                     page.content = content
@@ -218,7 +218,22 @@ adminRouter.post('/page/edit/:id', (req, res) => {
 
 })
 
-
+adminRouter.get('/page/delete/:id', (req, res) => {
+    let { id } = req.params;
+    Page.findByIdAndRemove({ _id: id }, (err, page) => {
+        if (err)
+            console.log(err + '');
+        req.flash('success', 'Page removed');
+        // res.redirect('/admin/page')
+        Page.find({}).sort({ 'sorting': 1 }).exec((err, data) => {
+            res.render('page/admin/page', {
+                ptitle: 'Page management...',
+                breadscrum: 'Page Management',
+                page: data
+            });
+        })
+    })
+})
 
 //[2018.06.01] export the admin router 
 module.exports = adminRouter
