@@ -101,11 +101,18 @@ adminRouter.post('/page/reorder', (req, res) => {
     }
 });
 //[2018.06.01] get the editting page form
-adminRouter.get('/page/edit', (req, res) => {
-    res.render('page/admin/edit-page', {
-        ptitle: 'Editting page ',
-        breadscrum: 'Editting: page id here'
-    });
+adminRouter.get('/page/edit/:_id', (req, res) => {
+    let {_id} = req.params;
+    Page.findById(_id, (err, page)=>{
+        res.render('page/admin/edit-page', {
+            ptitle: 'Editting page ',
+            breadscrum: 'Page _id: ' + page._id,
+            title: page.title,
+            slug: page.slug,
+            content: page.content
+        });
+    })
+    
 });
 //[2018.06.01] export the admin router 
 module.exports = adminRouter
