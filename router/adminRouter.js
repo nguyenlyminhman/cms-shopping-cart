@@ -101,18 +101,124 @@ adminRouter.post('/page/reorder', (req, res) => {
     }
 });
 //[2018.06.01] get the editting page form
-adminRouter.get('/page/edit/:_id', (req, res) => {
-    let {_id} = req.params;
-    Page.findById(_id, (err, page)=>{
+adminRouter.get('/page/edit/:id', (req, res) => {
+    //[2018.06.10] get the page information form
+    let { id } = req.params;
+    Page.findById(id, (err, page) => {
         res.render('page/admin/edit-page', {
-            ptitle: 'Editting page ',
+            ptitle: 'Page | Edit ',
             breadscrum: 'Page _id: ' + page._id,
+            id: page._id,
             title: page.title,
             slug: page.slug,
             content: page.content
         });
     })
-    
+
 });
+
+//[2018.06.10] get the editting page form
+adminRouter.post('/page/edit/:id', (req, res) => {
+    //check null value
+    req.checkBody('title', 'Title must have a value.').notEmpty();
+    req.checkBody('slug', 'Slug must have a value.').notEmpty();
+    req.checkBody('content', 'Content must have a value.').notEmpty();
+    let errors = req.validationErrors();
+    //get value from edit form
+    let { id, title, slug, content } = req.body;
+    //send error to edit-page.
+    if (errors) {
+        res.render('page/admin/edit-page/' + id, {
+            ptitle: 'Page | Edit',
+            breadscrum: 'Page _id: ' + id,
+            id: id,
+            errors: errors,
+            title: title,
+            slug: slug,
+            content: content
+        });
+    } else {
+        //get slug base on its _id to compare to the slug get from form. 
+        Page.findOne({ _id: id }, (err, page) => {
+            //the slug was change
+            if (page.slug !== slug) {
+                //Find new slug in database.
+                Page.findOne({ slug: slug }, (err, page) => {
+                    //If exist
+                    if (page) {
+                        //send to edit page.
+                        req.flash('danger', 'Slug was exist.');
+                        res.render('page/admin/edit-page', {
+                            ptitle: 'Page | Edit',
+                            breadscrum: 'Page _id: ' + id,
+                            errors: errors,
+                            id: id,
+                            title: title,
+                            slug: slug,
+                            content: content
+                        });
+                    } else {
+                        //Find the page base on its id.
+                        Page.findById({ _id: id }, (err, page) => {
+                            if (err)
+                                console.log(err+'');
+                            //assign new value    
+                            page.title = title;
+                            page.slug = slug;
+                            page.content = content
+                            //save to database.
+                            page.save(err => {
+                                if (err) {
+                                    return console.log(err + '');
+                                }
+                                req.flash('success', 'Page updated')
+                                res.render('page/admin/edit-page', {
+                                    ptitle: 'Add new page...',
+                                    breadscrum: 'Add new',
+                                    errors: errors,
+                                    id: id,
+                                    title: title,
+                                    slug: slug,
+                                    content: content
+                                });
+                            });
+                        })
+                    }
+                });
+                //the slug is the same id.
+            } else {
+                //the slug is not change
+                Page.findById({ _id: id }, (err, page) => {
+                    if (err)
+                        console.log(err+'');
+                    page.title = title;
+                    page.slug = slug;
+                    page.content = content
+                    page.save(err => {
+                        if (err) {
+                            return console.log(err + '');
+                        }
+                        req.flash('success', 'Page updated')
+                        res.render('page/admin/edit-page', {
+                            ptitle: 'Add new page...',
+                            breadscrum: 'Add new',
+                            errors: errors,
+                            id: id,
+                            title: title,
+                            slug: slug,
+                            content: content
+                        });
+                    });
+                })
+
+            }
+        }
+        )
+    }
+
+})
+
+
+
 //[2018.06.01] export the admin router 
 module.exports = adminRouter
