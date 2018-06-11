@@ -1,0 +1,33 @@
+<% include ../../layout/admin/header %>
+
+    <div class="rows">
+        <div class="text-center">
+            <h1>
+                <%= breadscrum%>
+            </h1>
+        </div>
+        
+        <a href="/admin/category" class="btn btn-info float-right"> <span class="glyphicon glyphicon-hand-left"> Back </span> </a>
+    </div>
+    <br/>
+    <% include errors %>
+    <% include message %>
+    <br/>
+    <div class="rows">
+        <form method="POST" action="/admin/category/add-category">
+            <div class="form-group">
+                <label for="exampleFormControlInput1">Title</label>
+                <input type="text" name="name" value="<%=name%>" class="form-control" id="title" placeholder="Title">
+            </div>
+            <div class="form-group">
+                <label for="exampleFormControlInput1">Slug</label>
+                <input type="text" name="slug" value="<%=slug%>" class="form-control" id="slug" placeholder="Slug">
+            </div>
+            <div class="form-group">
+                <input type="reset" value="Reset" class="btn btn-default"/>
+                <input type="submit" value="Submit" class="btn btn-info"/>
+            </div>
+        </form>
+    </div>
+
+    <% include ../../layout/admin/footer %>

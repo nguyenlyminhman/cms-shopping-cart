@@ -1,6 +1,7 @@
 const express = require('express');
 const adminRouter = express.Router();
 let Page = require('../models/page');
+let Category = require('../models/category')
 let { removeSpace } = require('../common/slugHelper');
 
 //[2018.06.01] get dashboard admin
@@ -234,6 +235,196 @@ adminRouter.get('/page/delete/:id', (req, res) => {
         })
     })
 })
+//[2018.06.11] export the admin router 
+adminRouter.get('/category', (req, res) => {
+    Category.find({}).sort({ 'sorting': 1 }).exec((err, data) => {
+        res.render('page/admin/category', {
+            ptitle: 'Page management...',
+            breadscrum: 'Page Management',
+            page: data
+        });
+    })
+})
+//[2018.06.01] get the add new page form
+adminRouter.get('/category/add-category', (req, res) => {
+    res.render('page/admin/add-category', {
+        ptitle: 'Add category...',
+        breadscrum: 'Add new',
+        name: '',
+        slug: ''
+    });
+});
+//[2018.06.01] post the new page info to database.
+adminRouter.post('/category/add-category', (req, res) => {
+    req.checkBody('name', 'Category name must have a value.').notEmpty();
+    req.checkBody('slug', 'Slug must have a value.').notEmpty();
+    let { name, slug } = req.body;
+    let errors = req.validationErrors();
+    if (errors) {
+        res.render('page/admin/add-category', {
+            ptitle: 'Add new page...',
+            breadscrum: 'Add new',
+            errors: errors,
+            name: name,
+            slug: slug
+        });
+    } else {
+        Category.findOne({ slug: removeSpace(slug) }, (err, cate) => {
+            if (cate) {
+                req.flash('danger', 'Slug was exist.');
+                res.render('page/admin/add-page', {
+                    ptitle: 'Add new page...',
+                    breadscrum: 'Add new',
+                    errors: errors,
+                    name: name,
+                    slug: slug
+                });
+            } else {
+                let cate = new Category({
+                    name: name,
+                    slug: removeSpace(slug)
+                });
+                cate.save(err => {
+                    if (err) {
+                        return console.log(err + '');
+                    }
+                    req.flash('success', 'Category added')
+                    res.render('page/admin/add-category', {
+                        ptitle: 'Add new category...',
+                        breadscrum: 'Add new',
+                        errors: errors,
+                        name: '',
+                        slug: ''
+                    });
+                });
+            }
+        })
+    }
+});
+//[2018.06.01] get the editting page form
+adminRouter.get('/category/edit/:id', (req, res) => {
+    //[2018.06.10] get the page information form
+    let { id } = req.params;
+    Category.findById(id, (err, cate) => {
+        res.render('page/admin/edit-category', {
+            ptitle: 'Category | Edit...',
+            breadscrum: 'Category _id: ' + cate._id,
+            id: cate._id,
+            name: cate.name,
+            slug: cate.slug
+        });
+    })
 
+});
+//[2018.06.10] get the editting page form
+adminRouter.post('/category/edit/:id', (req, res) => {
+    //check null value
+    req.checkBody('name', 'Category name must have a value.').notEmpty();
+    req.checkBody('slug', 'Slug must have a value.').notEmpty();
+    let errors = req.validationErrors();
+    //get value from edit form
+    let { id, name, slug } = req.body;
+    //send error to edit-page.
+    if (errors) {
+        res.render('page/admin/edit-category', {
+            ptitle: 'Category | Edit...',
+            breadscrum: 'Category _id: ' + id,
+            id: id,
+            errors: errors,
+            name: name,
+            slug: slug
+        });
+    } else {
+        //get slug base on its _id to compare to the slug get from form. 
+        Category.findOne({ _id: id }, (err, cate) => {
+            //the slug was change
+            if (cate.slug !== slug) {
+                //Find new slug in database.
+                Category.findOne({ slug: slug }, (err, cate) => {
+                    //If exist
+                    if (cate) {
+                        //send to edit page.
+                        req.flash('danger', 'Slug was exist.');
+                        res.render('page/admin/edit-category', {
+                            ptitle: 'Category | Edit...',
+                            breadscrum: 'Category _id: ' + id,
+                            errors: errors,
+                            id: id,
+                            name: title,
+                            slug: slug
+                        });
+                    } else {
+                        //Find the page base on its id.
+                        Category.findById({ _id: id }, (err, cate) => {
+                            if (err)
+                                console.log(err + '');
+                            //assign new value    
+                            cate.name = name;
+                            cate.slug = slug;
+                            //save to database.
+                            cate.save(err => {
+                                if (err) {
+                                    return console.log(err + '');
+                                }
+                                req.flash('success', 'Page updated')
+                                res.render('page/admin/edit-category', {
+                                    ptitle: 'Category || Edit...',
+                                    breadscrum: 'Edit...',
+                                    errors: errors,
+                                    id: id,
+                                    name: title,
+                                    slug: slug
+                                });
+                            });
+                        })
+                    }
+                });
+                //the slug is the same id.
+            } else {
+                //the slug is not change
+                Category.findById({ _id: id }, (err, cate) => {
+                    if (err)
+                        console.log(err + '');
+                    cate.name = name;
+                    cate.slug = slug;
+                    cate.save(err => {
+                        if (err) {
+                            return console.log(err + '');
+                        }
+                        req.flash('success', 'Category name has updated')
+                        res.render('page/admin/edit-category', {
+                            ptitle: 'Category || Edit...',
+                            breadscrum: 'Edit...',
+                            errors: errors,
+                            id: id,
+                            name: name,
+                            slug: slug
+                        });
+                    });
+                })
+
+            }
+        }
+        )
+    }
+
+})
+
+adminRouter.get('/category/delete/:id', (req, res) => {
+    let { id } = req.params;
+    Category.findByIdAndRemove({ _id: id }, (err, cate) => {
+        if (err)
+            console.log(err + '');
+        req.flash('success', 'Page removed');
+        // res.redirect('/admin/page')
+        Category.find({}).sort({ 'name': 1 }).exec((err, data) => {
+            res.render('page/admin/category', {
+                ptitle: 'Category management...',
+                breadscrum: 'Category Management',
+                page: data
+            });
+        })
+    })
+})
 //[2018.06.01] export the admin router 
 module.exports = adminRouter
