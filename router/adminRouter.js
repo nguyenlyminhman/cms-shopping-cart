@@ -350,7 +350,7 @@ adminRouter.post('/category/edit/:id', (req, res) => {
                             breadscrum: 'Category _id: ' + id,
                             errors: errors,
                             id: id,
-                            name: title,
+                            name: name,
                             slug: slug
                         });
                     } else {
@@ -372,7 +372,7 @@ adminRouter.post('/category/edit/:id', (req, res) => {
                                     breadscrum: 'Edit...',
                                     errors: errors,
                                     id: id,
-                                    name: title,
+                                    name: name,
                                     slug: slug
                                 });
                             });
@@ -407,7 +407,6 @@ adminRouter.post('/category/edit/:id', (req, res) => {
         }
         )
     }
-
 })
 
 adminRouter.get('/category/delete/:id', (req, res) => {

@@ -7,7 +7,7 @@ userRouter.get('/', (req,res)=>{
     let title='';
     let content='';
     res.render('index', {
-        title: title,
+        ptitle: title,
         slug: slug,
         content: content,
     })
