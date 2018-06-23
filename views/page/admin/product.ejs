@@ -1,0 +1,48 @@
+<% include ../../layout/admin/header %>
+
+    <div class="rows">
+        <div class="text-center">
+            <h1>
+                <%= breadscrum%>
+            </h1>
+        </div>
+        <a href="/admin/category/add-category" class="btn btn-info float-right"> Add new </a>
+    </div>
+    <br/>
+    <% include errors %>
+        <% include message %>
+            <br/>
+            <div class="rows">
+                <table class="table table-hover table-dark" id="table_page">
+                    <thead>
+                        <tr>
+                            <th scope="col">Category</th>
+                            <th scope="col">Slug</th>
+                            <th scope="col" style="width: 15%;">Option</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% page.forEach(data=>{%>
+                            <tr id="id_<%=data._id%>" class="<%=data.slug%>">
+                                <td>
+                                    <%=data.name%>
+                                </td>
+                                <td>
+                                    <%=data.slug%>
+                                </td>
+                                <td>
+                                    <a href="/admin/category/edit/<%=data._id%>">
+                                        <img src="/img/pencil.png" />
+                                    </a>
+                                    ||
+                                    <a href="/admin/category/delete/<%=data._id%>">
+                                        <img src="/img/delete.png" />
+                                    </a>
+                                </td>
+                            </tr>
+                            <%})%>
+                    </tbody>
+                </table>
+            </div>
+            <% include ../../layout/admin/footer %>
+                

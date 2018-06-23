@@ -425,5 +425,10 @@ adminRouter.get('/category/delete/:id', (req, res) => {
         })
     })
 })
+//[2018/06/23] building the product router.
+
+
+
+
 //[2018.06.01] export the admin router 
 module.exports = adminRouter

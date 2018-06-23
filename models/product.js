@@ -8,6 +8,7 @@ var Product = mongoose.Schema({
     },
     slug: {
         type: String,
+        require:true
     },
     desc: {
         type: String,
