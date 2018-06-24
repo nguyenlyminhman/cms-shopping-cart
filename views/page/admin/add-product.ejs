@@ -22,6 +22,7 @@
                         <select name="category" class="form-control">
                             <option id="">Select</option>
                             <% cate.forEach(data=>{  %>
+                                <option disabled></option>
                                 <option id="<%=data._id%>">
                                     <%=data.name%>
                                 </option>
