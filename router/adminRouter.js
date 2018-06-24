@@ -1,7 +1,8 @@
 const express = require('express');
 const adminRouter = express.Router();
 let Page = require('../models/page');
-let Category = require('../models/category')
+let Category = require('../models/category');
+let Product = require('../models/product');
 let { removeSpace } = require('../common/slugHelper');
 
 //[2018.06.01] get dashboard admin
@@ -426,8 +427,85 @@ adminRouter.get('/category/delete/:id', (req, res) => {
     })
 })
 //[2018/06/23] building the product router.
+adminRouter.get('/product', (req, res) => {
+    Product.find({}).exec((err, data) => {
+        res.render('page/admin/product', {
+            ptitle: 'CMS || Product',
+            breadscrum: 'Product Management',
+            product: data
+        });
+    });
+});
+//[2018.06.24] get the add new product form
+adminRouter.get('/product/add-product', (req, res) => {
+    Category.find().exec((err, data) => {
+        res.render('page/admin/add-product', {
+            ptitle: 'CMS || Product',
+            breadscrum: 'Add new',
+            cate: data,
+            name: '',
+            slug: '',
+            price: '',
+            desc: ''
+        });
+    })
+});
+//[2018.06.01] post the new page info to database.
+adminRouter.post('/page/add-page', (req, res) => {
+    req.checkBody('category', 'Category must have a value.').notEmpty();
+    req.checkBody('name', 'Product name must have a value.').notEmpty();
+    req.checkBody('slug', 'Slug must have a value.').notEmpty();
+    req.checkBody('price', 'Price must have a value.').notEmpty();
+    req.checkBody('description', 'Description must have a value.').notEmpty();
 
-
+    let { title, slug, content } = req.body;
+    let errors = req.validationErrors();
+    if (errors) {
+        res.render('page/admin/add-page', {
+            ptitle: 'CMS || Product',
+            breadscrum: 'Add new',
+            errors: errors,
+            title: title,
+            slug: slug,
+            content: content
+        });
+    } else {
+        Page.findOne({ slug: removeSpace(slug) }, (err, page) => {
+            if (page) {
+                req.flash('danger', 'Slug was exist.');
+                res.render('page/admin/add-page', {
+                    ptitle: 'Add new page...',
+                    breadscrum: 'Add new',
+                    errors: errors,
+                    title: title,
+                    slug: slug,
+                    content: content
+                });
+            } else {
+                let page = new Page({
+                    title: title,
+                    slug: removeSpace(slug),
+                    content: content,
+                    sorting: 0
+                });
+                page.save(err => {
+                    if (err) {
+                        return console.log(err + '');
+                    }
+                    req.flash('success', 'Page added')
+                    res.render('page/admin/add-page', {
+                        ptitle: 'Add new page...',
+                        breadscrum: 'Add new',
+                        errors: errors,
+                        title: '',
+                        slug: '',
+                        content: ''
+                    });
+                });
+            }
+        })
+    }
+});
 
 
 //[2018.06.01] export the admin router 
