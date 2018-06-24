@@ -451,55 +451,70 @@ adminRouter.get('/product/add-product', (req, res) => {
     })
 });
 //[2018.06.01] post the new page info to database.
-adminRouter.post('/page/add-page', (req, res) => {
+adminRouter.post('/product/add-product', (req, res) => {
     req.checkBody('category', 'Category must have a value.').notEmpty();
     req.checkBody('name', 'Product name must have a value.').notEmpty();
     req.checkBody('slug', 'Slug must have a value.').notEmpty();
     req.checkBody('price', 'Price must have a value.').notEmpty();
     req.checkBody('description', 'Description must have a value.').notEmpty();
+    req.checkBody('image', 'Image must have a value.').notEmpty();
 
-    let { title, slug, content } = req.body;
+    let { category, name, slug, price, description, image } = req.body;
     let errors = req.validationErrors();
     if (errors) {
-        res.render('page/admin/add-page', {
-            ptitle: 'CMS || Product',
-            breadscrum: 'Add new',
-            errors: errors,
-            title: title,
-            slug: slug,
-            content: content
+        Category.find().exec((err, data) => {
+            res.render('page/admin/add-product', {
+                ptitle: 'CMS || Product',
+                breadscrum: 'Add new',
+                cate: data,
+                errors: errors,
+                name: name,
+                slug: slug,
+                price: price,
+                desc: description
+            });
         });
     } else {
-        Page.findOne({ slug: removeSpace(slug) }, (err, page) => {
-            if (page) {
+        Product.findOne({ slug: removeSpace(slug) }, (err, product) => {
+            if (product) {
                 req.flash('danger', 'Slug was exist.');
-                res.render('page/admin/add-page', {
-                    ptitle: 'Add new page...',
-                    breadscrum: 'Add new',
-                    errors: errors,
-                    title: title,
-                    slug: slug,
-                    content: content
+                Category.find().exec((err, data) => {
+                    res.render('page/admin/add-product', {
+                        ptitle: 'CMS || Product',
+                        breadscrum: 'Add new',
+                        cate: data,
+                        errors: errors,
+                        name: name,
+                        slug: slug,
+                        price: price,
+                        desc: description
+                    });
                 });
             } else {
-                let page = new Page({
-                    title: title,
+                let product = new Product({
+                    name: name,
                     slug: removeSpace(slug),
-                    content: content,
-                    sorting: 0
+                    desc: description,
+                    category: category,
+                    price: price,
+                    image: image
                 });
-                page.save(err => {
+                product.save(err => {
                     if (err) {
                         return console.log(err + '');
                     }
-                    req.flash('success', 'Page added')
-                    res.render('page/admin/add-page', {
-                        ptitle: 'Add new page...',
-                        breadscrum: 'Add new',
-                        errors: errors,
-                        title: '',
-                        slug: '',
-                        content: ''
+                    req.flash('success', 'Product added')
+                    Category.find().exec((err, data) => {
+                        res.render('page/admin/add-product', {
+                            ptitle: 'CMS || Product',
+                            breadscrum: 'Add new',
+                            cate: data,
+                            errors: errors,
+                            name: '',
+                            slug: '',
+                            price: '',
+                            desc: ''
+                        });
                     });
                 });
             }
