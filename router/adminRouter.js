@@ -452,6 +452,7 @@ adminRouter.get('/product/add-product', (req, res) => {
 });
 //[2018.06.01] post the new page info to database.
 adminRouter.post('/product/add-product', (req, res) => {
+    
     req.checkBody('category', 'Category must have a value.').notEmpty();
     req.checkBody('name', 'Product name must have a value.').notEmpty();
     req.checkBody('slug', 'Slug must have a value.').notEmpty();
