@@ -48,8 +48,8 @@
                     </div>
                     <div class="form-group">
                         <label for="image">Image</label>
-                        <input type="file" name="image" class="form-control" id="image"/>
-                        <img src="#" id="previewImage"  class="img-thumbnail" alt="">
+                        <input type="file" name="images" class="form-control" id="images"/>
+                        <img src="#" id="previewImage" class="img-thumbnail" alt="">
                      </div>
                     <div class="form-group">
                         <input type="reset" value="Reset" class="btn btn-default" />
@@ -69,7 +69,7 @@
                         reader.readAsDataURL(input.files[0])
                     }
                 }
-                $('#image').change(function(){
+                $('#images').change(function(){
                     readImage(this);
                 })
             </script>

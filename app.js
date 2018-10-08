@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const { db } = require('./common/db-connection');
 const session = require('express-session');
 const validate = require('express-validator');
+const fileUpload = require('express-fileupload')
 
 const router = require('./router');
 //use session to manage loged in user.
@@ -33,6 +34,9 @@ app.use(function (req, res, next) {
 
 //set local global errors
 app.locals.errors = null;
+
+//set file upload
+app.use(fileUpload());
 
 //using express-validator to check value get from form.
 app.use(validate());

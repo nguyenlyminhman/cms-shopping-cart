@@ -1,5 +1,8 @@
 const express = require('express');
 const adminRouter = express.Router();
+const mkdir = require('mkdirp');
+const resizeImage = require('resize-img');
+const fse = require('fs-extra')
 let Page = require('../models/page');
 let Category = require('../models/category');
 let Product = require('../models/product');
@@ -452,16 +455,19 @@ adminRouter.get('/product/add-product', (req, res) => {
 });
 //[2018.06.01] post the new page info to database.
 adminRouter.post('/product/add-product', (req, res) => {
-    
+
+    let imageFiles = typeof req.files.images !== "undefined" ?  req.files.images.name : "";
     req.checkBody('category', 'Category must have a value.').notEmpty();
     req.checkBody('name', 'Product name must have a value.').notEmpty();
     req.checkBody('slug', 'Slug must have a value.').notEmpty();
-    req.checkBody('price', 'Price must have a value.').notEmpty();
+    req.checkBody('price', 'Price must have a number.').isDecimal();
     req.checkBody('description', 'Description must have a value.').notEmpty();
-    req.checkBody('image', 'Image must have a value.').notEmpty();
-
-    let { category, name, slug, price, description, image } = req.body;
+    // req.checkBody('images', 'Image must have a value.').notEmpty();
+    
+    let { category, name, slug, price, description, images } = req.body;
+    console.log(images)
     let errors = req.validationErrors();
+    
     if (errors) {
         Category.find().exec((err, data) => {
             res.render('page/admin/add-product', {
@@ -498,7 +504,7 @@ adminRouter.post('/product/add-product', (req, res) => {
                     desc: description,
                     category: category,
                     price: price,
-                    image: image
+                    image: images
                 });
                 product.save(err => {
                     if (err) {
@@ -521,6 +527,7 @@ adminRouter.post('/product/add-product', (req, res) => {
             }
         })
     }
+    
 });
 
 
