@@ -530,6 +530,21 @@ adminRouter.post('/product/add-product', (req, res) => {
     
 });
 
-
+adminRouter.get('/product/delete/:id', (req, res) => {
+    let { id } = req.params;
+    Product.findByIdAndRemove({ _id: id }, (err, cate) => {
+        if (err)
+            console.log(err + '');
+        req.flash('success', 'Product removed');
+        // res.redirect('/admin/page')
+        Product.find({}).sort({ 'name': 1 }).exec((err, data) => {
+            res.render('page/admin/product', {
+                ptitle: 'Product management...',
+                breadscrum: 'Product Management',
+                product: data
+            });
+        })
+    })
+})
 //[2018.06.01] export the admin router 
 module.exports = adminRouter
