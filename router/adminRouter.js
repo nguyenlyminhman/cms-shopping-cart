@@ -465,7 +465,6 @@ adminRouter.post('/product/add-product', (req, res) => {
     // req.checkBody('images', 'Image must have a value.').notEmpty();
     
     let { category, name, slug, price, description, images } = req.body;
-    console.log(images)
     let errors = req.validationErrors();
     
     if (errors) {
@@ -530,6 +529,100 @@ adminRouter.post('/product/add-product', (req, res) => {
     
 });
 
+//[2018.06.10] get the editting page form
+adminRouter.get('/product/edit/:id', (req, res) => {
+    //check null value
+    req.checkBody('name', 'Product name must have a value.').notEmpty();
+    req.checkBody('slug', 'Product must have a value.').notEmpty();
+    let errors = req.validationErrors();
+    //get value from edit form
+    let { id, name, slug } = req.body;
+    //send error to edit-page.
+    if (errors) {
+        res.render('page/admin/edit-product', {
+            ptitle: 'Product | Edit...',
+            breadscrum: 'Product _id: ' + id,
+            id: id,
+            errors: errors,
+            name: name,
+            slug: slug
+        });
+    } else {
+        //get slug base on its _id to compare to the slug get from form. 
+        Product.findOne({ _id: id }, (err, cate) => {
+            //the slug was change
+            if (cate.slug !== slug) {
+                //Find new slug in database.
+                Product.findOne({ slug: slug }, (err, cate) => {
+                    //If exist
+                    if (cate) {
+                        //send to edit page.
+                        req.flash('danger', 'Slug was exist.');
+                        res.render('page/admin/edit-category', {
+                            ptitle: 'Category | Edit...',
+                            breadscrum: 'Category _id: ' + id,
+                            errors: errors,
+                            id: id,
+                            name: name,
+                            slug: slug
+                        });
+                    } else {
+                        //Find the page base on its id.
+                        Product.findById({ _id: id }, (err, cate) => {
+                            if (err)
+                                console.log(err + '');
+                            //assign new value    
+                            cate.name = name;
+                            cate.slug = slug;
+                            //save to database.
+                            cate.save(err => {
+                                if (err) {
+                                    return console.log(err + '');
+                                }
+                                req.flash('success', 'Page updated')
+                                res.render('page/admin/edit-category', {
+                                    ptitle: 'Category || Edit...',
+                                    breadscrum: 'Edit...',
+                                    errors: errors,
+                                    id: id,
+                                    name: name,
+                                    slug: slug
+                                });
+                            });
+                        })
+                    }
+                });
+                //the slug is the same id.
+            } else {
+                //the slug is not change
+                Product.findById({ _id: id }, (err, cate) => {
+                    if (err)
+                        console.log(err + '');
+                    cate.name = name;
+                    cate.slug = slug;
+                    cate.save(err => {
+                        if (err) {
+                            return console.log(err + '');
+                        }
+                        req.flash('success', 'Category name has updated')
+                        res.render('page/admin/edit-category', {
+                            ptitle: 'Category || Edit...',
+                            breadscrum: 'Edit...',
+                            errors: errors,
+                            id: id,
+                            name: name,
+                            slug: slug
+                        });
+                    });
+                })
+
+            }
+        }
+        )
+    }
+})
+
+
 adminRouter.get('/product/delete/:id', (req, res) => {
     let { id } = req.params;
     Product.findByIdAndRemove({ _id: id }, (err, cate) => {
@@ -546,5 +639,6 @@ adminRouter.get('/product/delete/:id', (req, res) => {
         })
     })
 })
+
 //[2018.06.01] export the admin router 
 module.exports = adminRouter
